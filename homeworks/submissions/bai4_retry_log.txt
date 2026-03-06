@@ -1,66 +1,31 @@
-(venv) PS D:\SANG\VS_CODE\CODE\DEMO\asset-management-python> python main.py                                       
-
+(venv) PS D:\SANG\VS_CODE\CODE\DEMO\asset-management-python> python .\main.py
 🔄 Database connection attempt 1/5...
-
-⚠️  Attempt 1 failed: (psycopg2.OperationalError) connection to server at "localhost" (::1), port 5432 failed: Connection refused (0x0000274D/10061)
-
-        Is the server running on that host and accepting TCP/IP connections?
-
-connection to server at "localhost" (127.0.0.1), port 5432 failed: Connection refused (0x0000274D/10061)
-
-        Is the server running on that host and accepting TCP/IP connections?
-
-
+⚠️  Attempt 1 failed: (psycopg2.OperationalError) connection to server at "localhost" (::1), port 5432 failed: FATAL:  database "asset_managemen" does not exist
 
 (Background on this error at: https://sqlalche.me/e/20/e3q8)
-
 ⏳ Retrying in 1s...
 
-
-
 🔄 Database connection attempt 2/5...
-
-⚠️  Attempt 2 failed: (psycopg2.OperationalError) connecttion to server at "localhost" (::1), port 5432 failed: Connection refused (0x0000274D/10061)
-
-        Is the server running on that host and accepting TCP/IP connections?
-
-connection to server at "localhost" (127.0.0.1), port 5432 failed: Connection refused (0x0000274D/10061)
-
-        Is the server running on that host and accepting TCP/IP connections?
-
-
+⚠️  Attempt 2 failed: (psycopg2.OperationalError) connecction to server at "localhost" (::1), port 5432 failed: FATAL:  database "asset_managemen" does not exist        
 
 (Background on this error at: https://sqlalche.me/e/20/e3q8)
-
 ⏳ Retrying in 2s...
 
-
-
 🔄 Database connection attempt 3/5...
+⚠️  Attempt 3 failed: (psycopg2.OperationalError) connecction to server at "localhost" (::1), port 5432 failed: FATAL:  database "asset_managemen" does not exist        
 
-⚠️  Attempt 3 failed: (psycopg2.OperationalError) connecttion to server at "localhost" (::1), port 5432 failed: Connection refused (0x0000274D/10061)
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+⏳ Retrying in 4s...
 
-        Is the server running on that host and accepting TCP/IP connections?
+🔄 Database connection attempt 4/5...
+⚠️  Attempt 4 failed: (psycopg2.OperationalError) connecction to server at "localhost" (::1), port 5432 failed: FATAL:  database "asset_managemen" does not exist        
 
-connection to server at "localhost" (127.0.0.1), port 5432 failed: Connection refused (0x0000274D/10061)
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+⏳ Retrying in 8s...
 
-        Is the server running on that host and accepting TCP/IP connections?
-
-
+🔄 Database connection attempt 5/5...
+⚠️  Attempt 5 failed: (psycopg2.OperationalError) connecction to server at "localhost" (::1), port 5432 failed: FATAL:  database "asset_managemen" does not exist        
 
 (Background on this error at: https://sqlalche.me/e/20/e3q8)
 
-⏳ Retrying in 4s...
-
-
-
-🔄 Database connection attempt 4/5...
-
-⚠️  Attempt 4 failed: (psycopg2.OperationalError) connecttion to server at "localhost" (::1), port 5432 failed: Connection refused (0x0000274D/10061)
-
-        Is the server running on that host and accepting TCP/IP connections?
-
-connection to server at "localhost" (127.0.0.1), port 5432 failed: Connection refused (0x0000274D/10061)
-
-        Is the server running on that host and accepting TCP/IP connections?
-
+❌ All 5 connection attempts failed. Shutting down. 
