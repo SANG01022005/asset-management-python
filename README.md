@@ -33,19 +33,19 @@ Hoặc nếu sử dụng PostgreSQL cài trực tiếp trên máy, hãy đảm b
 2. Thiết lập môi trường Python
 Dự án sử dụng môi trường ảo để quản lý thư viện độc lập.
 
-   2.1. Kích hoạt môi trường ảo (Windows)
+   2.1. Kích hoạt môi trường ảo (Windows): 
   .\venv\Scripts\Activate.ps1
   
-   2.2. Cài đặt các thư viện phụ thuộc
+   2.2. Cài đặt các thư viện phụ thuộc: 
   pip install -r requirements.txt
   
-   2.3. Cấu hình biến môi trường
-  Copy file .env.example thành .env và chỉnh sửa DATABASE_URL
-cp .env.example .env
-3. Khởi chạy ứng dụng
+   2.3. Cấu hình biến môi trường:
+  Copy file .env.example thành .env và chỉnh sửa DATABASE_URL: 
+   cp .env.example .env
+3. Khởi chạy ứng dụng: 
 python main.py
 
-##Các tính năng nổi bật:
+##Các tính năng nổi bật: 
 Batch Operations: Hỗ trợ tạo và xóa hàng loạt tài sản trong một Transaction (nguyên tử).
 Connection Retry: Cơ chế tự động thử lại kết nối khi Database gặp sự cố.
 Pagination & Search: Phân trang linh hoạt và tìm kiếm tài sản theo tên (không phân biệt hoa thường).
