@@ -1,4 +1,4 @@
-﻿curl "http://localhost:8080/assets?page=2&limit=5&type=domain&status=active" 
+GET http://localhost:8080/assets?page=2&limit=5&type=domain&status=active  (postman)
 
 {
     "data": [
@@ -45,3 +45,4 @@
         "total_pages": 3
     }
 }
+
