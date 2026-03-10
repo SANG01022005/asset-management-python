@@ -17,7 +17,6 @@ asset-management-python/
 ├── homeworks/
 │   └── submissions/    # Minh chứng kết quả thực hiện bài tập (Command outputs)
 ├── venv/               # Môi trường ảo Python (Virtual Environment)
-├── .env                # Biến môi trường (DATABASE_URL,...)
 ├── .env.example        # File mẫu cấu hình biến môi trường
 ├── .gitignore          # Cấu hình các file không đẩy lên Git (venv, .env)
 ├── main.py             # Điểm chạy ứng dụng (Entry point)
