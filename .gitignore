@@ -1,0 +1,35 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+
+# --- Environments (Quan trọng) ---
+# Không đẩy thư mục venv lên GitHub vì nó rất nặng và chứa path máy cá nhân
+venv/
+env/
+.env
+.venv
+ENV/
+
+# --- Database & Config ---
+# Không đẩy file chứa thông tin nhạy cảm
+.env
+*.db
+*.sqlite3
+
+# --- IDEs & Editors ---
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# --- Docker ---
+.docker/
+# Nếu bạn lưu dữ liệu db trong folder nội bộ, hãy ignore nó
+postgres_data/
+
+# --- OS ---
+.DS_Store
+Thumbs.db

@@ -1,0 +1,48 @@
+GET http://localhost:8080/assets?page=2&limit=5&type=domain&status=active  (postman)
+
+{
+    "data": [
+        {
+            "name": "example.com",
+            "type": "domain",
+            "status": "active",
+            "id": "eb0751ac-8471-44f8-b37e-654f64f07171",
+            "created_at": "2026-03-07T09:38:59.312954+07:00"
+        },
+        {
+            "name": "example.com",
+            "type": "domain",
+            "status": "active",
+            "id": "650fd35b-d249-42e0-93cf-240b9ad9de3a",
+            "created_at": "2026-03-07T09:38:58.235251+07:00"
+        },
+        {
+            "name": "example.com",
+            "type": "domain",
+            "status": "active",
+            "id": "18de0a7c-510a-48e7-b3ff-f3a4c8e7a27f",
+            "created_at": "2026-03-07T09:38:03.761689+07:00"
+        },
+        {
+            "name": "example.com",
+            "type": "domain",
+            "status": "active",
+            "id": "89dc0ce7-50a4-4d3e-a549-55975cef01d0",
+            "created_at": "2026-03-07T09:37:54.714626+07:00"
+        },
+        {
+            "name": "example.com",
+            "type": "domain",
+            "status": "active",
+            "id": "a3f51d74-77e8-4741-bd82-8f0afefa8dac",
+            "created_at": "2026-03-07T09:24:53.624741+07:00"
+        }
+    ],
+    "pagination": {
+        "page": 2,
+        "limit": 5,
+        "total": 11,
+        "total_pages": 3
+    }
+}
+
