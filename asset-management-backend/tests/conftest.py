@@ -1,22 +1,17 @@
 """
 tests/conftest.py
-Shared fixtures cho toàn bộ test suite.
+Shared fixtures — SQLite in-memory, không cần PostgreSQL.
 
-Bài học từ các lỗi cũ:
-1. Inject db_module TRƯỚC khi import main (tránh connect_with_retry crash)
-2. Mock lifespan TRƯỚC khi import main (tránh TestClient hang)
-3. reset_db autouse → isolation tuyệt đối giữa các tests
-4. client fixture export get_db override đúng db_session
+Chiến lược: inject _TEST_ENGINE vào db_module TRƯỚC khi import main.
+main.py tự phát hiện SQLite → bỏ qua connect_with_retry().
+Không cần mock lifespan nữa.
 """
-from contextlib import asynccontextmanager
-from unittest.mock import patch
-
 import pytest
 from sqlalchemy import create_engine, event
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
-# ── 1. Setup SQLite test engine TRƯỚC KHI import main ─────────────────────────
+# ── 1. Setup SQLite TRƯỚC KHI import main ─────────────────────────────────────
 import app.infrastructure.database as db_module
 from app.domain.models import Base
 
@@ -32,18 +27,12 @@ def _set_fk(conn, _):
 
 _TestSession = sessionmaker(bind=_TEST_ENGINE, autocommit=False, autoflush=False)
 
-# Inject vào db_module TRƯỚC khi import main
+# Inject TRƯỚC khi import main — main.py sẽ detect SQLite và skip connect_with_retry
 db_module.engine       = _TEST_ENGINE
 db_module.SessionLocal = _TestSession
 
-# ── 2. Mock lifespan để không gọi connect_with_retry() hay engine.dispose() ──
-@asynccontextmanager
-async def _mock_lifespan(app):
-    Base.metadata.create_all(bind=_TEST_ENGINE)
-    yield  # không dispose — tránh phá _TEST_ENGINE
-
-with patch("main.lifespan", _mock_lifespan):
-    from main import app  # import SAU khi đã patch
+# ── 2. Import main SAU KHI inject ─────────────────────────────────────────────
+from main import app  # noqa: E402 — main.py detect SQLite, không gọi PostgreSQL
 
 
 # ── 3. Fixtures ───────────────────────────────────────────────────────────────
@@ -64,7 +53,6 @@ def reset_db():
 
 @pytest.fixture
 def db_session():
-    """SQLite session cho mỗi test."""
     session = _TestSession()
     yield session
     session.close()
@@ -72,7 +60,6 @@ def db_session():
 
 @pytest.fixture
 def client(db_session):
-    """TestClient với get_db override — dùng db_session của test."""
     from fastapi.testclient import TestClient
 
     def _override_get_db():

@@ -14,11 +14,11 @@ from fastapi.responses import JSONResponse
 
 import app.infrastructure.database as db_module
 from app.domain.models import Base
-from app.api.health       import router as health_router
-from app.api.assets       import router as assets_router
-from app.api.scan_router  import router as scan_router
-from app.api.scan         import router as scan_api_router
-from app.api.tags_router  import router as tags_router
+from app.api.health        import router as health_router
+from app.api.assets        import router as assets_router
+from app.api.scan_router   import router as scan_router
+from app.api.scan          import router as scan_api_router
+from app.api.tags_router   import router as tags_router
 from app.api.export_router import router as export_router
 
 logging.basicConfig(
@@ -28,17 +28,35 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+# ── Phát hiện môi trường test ─────────────────────────────────────────────────
+# Khi pytest chạy, conftest.py đã inject _TEST_ENGINE vào db_module TRƯỚC
+# khi import main. Nếu engine đã là SQLite → bỏ qua connect_with_retry().
+def _is_test_environment() -> bool:
+    """Return True nếu đang chạy trong pytest với SQLite engine."""
+    if db_module.engine is not None:
+        url = str(db_module.engine.url)
+        return url.startswith("sqlite")
+    return False
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    logger.info("🚀 Starting Asset Management API...")
-    db_module.connect_with_retry(max_retries=5)
-    Base.metadata.create_all(bind=db_module.engine)
-    logger.info("✅ All tables verified / created.")
-    yield
-    logger.info("🛑 Shutting down...")
-    db_module.engine.dispose()
-    logger.info("👋 Shutdown complete.")
+    if _is_test_environment():
+        # Test environment: engine đã được inject bởi conftest.py
+        logger.info("🧪 Test environment detected — skipping connect_with_retry()")
+        Base.metadata.create_all(bind=db_module.engine)
+        yield
+        # Không dispose — tránh phá test engine
+    else:
+        # Production environment
+        logger.info("🚀 Starting Asset Management API...")
+        db_module.connect_with_retry(max_retries=5)
+        Base.metadata.create_all(bind=db_module.engine)
+        logger.info("✅ All tables verified / created.")
+        yield
+        logger.info("🛑 Shutting down...")
+        db_module.engine.dispose()
+        logger.info("👋 Shutdown complete.")
 
 
 app = FastAPI(title="Asset Management API", lifespan=lifespan, docs_url="/docs")
