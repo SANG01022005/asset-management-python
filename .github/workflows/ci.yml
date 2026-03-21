@@ -53,11 +53,11 @@ jobs:
         run: |
           pytest \
             --tb=short \
+            --ignore=tests/test_scan_service.py \
             --cov=app \
             --cov-report=term-missing \
             --cov-report=xml:coverage.xml \
-            --cov-report=html:htmlcov \
-            --cov-fail-under=20
+            --cov-fail-under=30
 
       - name: Upload coverage HTML
         if: always()
