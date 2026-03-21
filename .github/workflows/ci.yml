@@ -1,0 +1,157 @@
+# .github/workflows/ci.yml
+# Trigger: Pull Request → main
+# Jobs: test → security → gate
+
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - main
+    types: [opened, synchronize, reopened]
+
+concurrency:
+  group: ci-${{ github.head_ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  PYTHON_VERSION: "3.11"
+  # Dummy URL — tests dùng SQLite in-memory, không cần PostgreSQL thật
+  DATABASE_URL: "postgresql://ci:ci@localhost:5432/ci_db"
+
+jobs:
+  # ── Job 1: pytest + coverage ──────────────────────────────────────────────
+  test:
+    name: "🧪 pytest + coverage"
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: asset-management-backend
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install -r requirements-test.txt
+
+      - name: Run tests with coverage
+        run: |
+          pytest \
+            --tb=short \
+            --cov=app \
+            --cov-report=term-missing \
+            --cov-report=xml:coverage.xml \
+            --cov-report=html:htmlcov \
+            --cov-fail-under=20
+
+      - name: Upload coverage HTML
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-html-${{ github.sha }}
+          path: asset-management-backend/htmlcov/
+          retention-days: 14
+
+      - name: Upload coverage XML
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-xml-${{ github.sha }}
+          path: asset-management-backend/coverage.xml
+          retention-days: 14
+
+  # ── Job 2: Security scanning ──────────────────────────────────────────────
+  security:
+    name: "🔒 Security scan"
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: asset-management-backend
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+
+      - name: Install security tools
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install bandit[toml] safety
+
+      - name: Run Bandit (SAST)
+        run: |
+          bandit -r app/ \
+            -ll \
+            -x tests/ \
+            -f json \
+            -o bandit-report.json \
+            || (cat bandit-report.json | python -m json.tool && exit 1)
+
+      - name: Upload Bandit report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bandit-report-${{ github.sha }}
+          path: asset-management-backend/bandit-report.json
+          retention-days: 14
+
+      - name: Run Safety (CVE check)
+        # safety scan thay cho safety check (deprecated ở v3+)
+        # || true để không block CI — chỉ lưu report để review
+        run: |
+          safety scan --output json > safety-report.json 2>&1 || true
+
+      - name: Upload Safety report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: safety-report-${{ github.sha }}
+          path: asset-management-backend/safety-report.json
+          retention-days: 14
+
+      - name: Run Gitleaks (secret detection)
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # ── Job 3: Gate — block merge nếu bất kỳ job nào fail ────────────────────
+  all-checks-passed:
+    name: "✅ All checks passed"
+    runs-on: ubuntu-latest
+    needs: [test, security]
+    if: always()
+
+    steps:
+      - name: Verify all jobs succeeded
+        run: |
+          if [[ "${{ needs.test.result }}"     != "success" ]] || \
+             [[ "${{ needs.security.result }}" != "success" ]]; then
+            echo "❌ One or more required jobs failed:"
+            echo "   test     → ${{ needs.test.result }}"
+            echo "   security → ${{ needs.security.result }}"
+            exit 1
+          fi
+          echo "✅ All required jobs passed — PR is ready to merge."
