@@ -15,11 +15,10 @@ load_dotenv()
 
 logger = logging.getLogger(__name__)
 
-DATABASE_URL = os.getenv("DATABASE_URL")
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./fallback.db")
 
-if not DATABASE_URL:
-    logger.critical("❌ DATABASE_URL not found in environment / .env file.")
-    sys.exit(1)
+if "DATABASE_URL" not in os.environ:
+    logger.warning("⚠️ DATABASE_URL not set — using SQLite fallback for testing.")
 
 Base = declarative_base()
 SessionLocal = None
