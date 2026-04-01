@@ -1,0 +1,25 @@
+# asset-management-backend/.coveragerc
+[run]
+source = app
+omit = 
+    */tests/*
+    */venv/*
+    */__pycache__/*
+    */migrations/*
+    */alembic/*
+    app/main.py
+
+[report]
+exclude_lines =
+    pragma: no cover
+    def __repr__
+    raise AssertionError
+    raise NotImplementedError
+    if __name__ == .__main__.:
+    if TYPE_CHECKING:
+    @abstractmethod
+    pass
+
+fail_under = 70
+show_missing = True
+precision = 2
